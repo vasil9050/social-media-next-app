@@ -15,8 +15,8 @@ const nextConfig = {
         hostname: "img.clerk.com",
       },
       {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
+        protocol: "http",
+        hostname: "localhost:8080",
       },
     ],
   },

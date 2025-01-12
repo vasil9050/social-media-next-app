@@ -42,6 +42,10 @@ export const addUserReq = (userData: AddUserRequest) => {
     return axiosInstance.post(API_ENDPOINTS.CREATE_USER, userData);
 };
 
+export const updateUserReq = (userData: AddUserRequest) => {
+    return axiosInstance.post(API_ENDPOINTS.UPDATE_USER, userData);
+};
+
 export const getUserReq = ({ id }: GetUserRequest) => {
     return axiosInstance.get(`${API_ENDPOINTS.GET_USER}/${id}`);
 };

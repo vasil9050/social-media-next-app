@@ -77,3 +77,70 @@ export const getUser = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
+
+export const updateUser = (req, res) => {
+    const {
+        id,
+        username,
+        avatar,
+        cover,
+        name,
+        surname,
+        description,
+        city,
+        school,
+        work,
+        website,
+    } = req.body;
+
+    console.log(">>>>", req.body);
+
+    if (!id) {
+        return res.status(400).json({ error: "ID is a required field." });
+    }
+
+    const query = `
+        UPDATE user 
+        SET 
+            username = ?, 
+            avatar = ?, 
+            cover = ?, 
+            name = ?, 
+            surname = ?, 
+            description = ?, 
+            city = ?, 
+            school = ?, 
+            work = ?, 
+            website = ?
+        WHERE id = ?
+    `;
+
+    db.query(
+        query,
+        [
+            username || null,
+            avatar || null,
+            cover || null,
+            name || null,
+            surname || null,
+            description || null,
+            city || null,
+            school || null,
+            work || null,
+            website || null,
+            id,
+        ],
+        (err, results) => {
+            if (err) {
+                console.error("Error updating user:", err.message);
+                return res.status(500).json({ error: "Database error occurred." });
+            }
+
+            if (results.affectedRows === 0) {
+                return res.status(404).json({ message: "User not found." });
+            }
+
+            res.status(200).json({ message: "User updated successfully." });
+        }
+    );
+};

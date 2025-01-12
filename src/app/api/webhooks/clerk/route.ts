@@ -1,7 +1,7 @@
 import { Webhook } from 'svix'
 import { headers } from 'next/headers'
 import { WebhookEvent } from '@clerk/nextjs/server'
-import { addUserReq } from '@/api/utils'
+import { addUserReq, updateUserReq } from '@/api/utils'
 
 export async function POST(req: Request) {
     const SIGNING_SECRET = process.env.SIGNING_SECRET
@@ -73,22 +73,22 @@ export async function POST(req: Request) {
         }
     }
 
-    // if (eventType === 'user.updated') {
-    //     const data = {
-    //         id: evt.data.id,
-    //         username: JSON.parse(body).data.username,
-    //         avatar: JSON.parse(body).data.avatar || '/noAvatar.png',
-    //         cover: '/noCover.png',
-    //     }
-    //     try {
-    //         const response = await addUserReq(data);
-    //         console.log(response.data);
-    //         return new Response("User  has been created", { status: 200 })
-    //     } catch (error) {
-    //         console.log(error);
-    //         return new Response("Failed to craete user!", { status: 500 })
-    //     }
-    // }
+    if (eventType === 'user.updated') {
+        const data = {
+            id: evt.data.id,
+            username: JSON.parse(body).data.username,
+            avatar: JSON.parse(body).data.avatar || '/noAvatar.png',
+            cover: '/noCover.png',
+        }
+        try {
+            const response = await updateUserReq(data);
+            console.log(response.data);
+            return new Response("User  has been created", { status: 200 })
+        } catch (error) {
+            console.log(error);
+            return new Response("Failed to craete user!", { status: 500 })
+        }
+    }
 
     return new Response('Webhook received', { status: 200 })
 }

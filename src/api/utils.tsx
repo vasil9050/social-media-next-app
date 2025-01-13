@@ -3,7 +3,8 @@ import { SERVER_BASE_URL, API_ENDPOINTS } from './server-config';
 
 // Define types for request payloads
 interface AddUserRequest {
-    username: string;
+    id?: string;
+    username?: string;
     avatar?: string;
     cover?: string;
     name?: string;
@@ -51,6 +52,9 @@ interface followReceive {
     receiverId: string;
 }
 
+interface CoverRequest {
+    cover: File;
+}
 // Axios instance
 const axiosInstance = axios.create({
     baseURL: SERVER_BASE_URL,
@@ -66,6 +70,10 @@ export const addUserReq = (userData: AddUserRequest) => {
 
 export const updateUserReq = (userData: AddUserRequest) => {
     return axiosInstance.post(API_ENDPOINTS.UPDATE_USER, userData);
+};
+
+export const updateCoverReq = (userData: CoverRequest) => {
+    return axiosInstance.post(API_ENDPOINTS.UPADTE_COVER, userData);
 };
 
 export const getUserbyusernameReq = ({ username }: GetUserByUserNameRequest) => {

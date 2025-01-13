@@ -1,6 +1,5 @@
 import { db } from "../config/db.js"
 
-
 export const addUser = (req, res) => {
     const {
         id,
@@ -87,70 +86,45 @@ export const getUser = async (req, res) => {
 }
 
 export const updateUser = (req, res) => {
-    const {
-        id,
-        username,
-        avatar,
-        cover,
-        name,
-        surname,
-        description,
-        city,
-        school,
-        work,
-        website,
-    } = req.body;
-
-    console.log(">>>>", req.body);
+    const { id, ...fieldsToUpdate } = req.body;
 
     if (!id) {
-        return res.status(400).json({ error: "ID is a required field." });
+        return res.status(400).json({ error: "User ID is required." });
     }
 
+    console.log(fieldsToUpdate);
+    const filteredFields = Object.entries(fieldsToUpdate).filter(
+        ([key, value]) => value !== "" && value !== undefined
+    );
+
+    if (filteredFields.length === 0) {
+        return res.status(400).json({ error: "No valid fields to update." });
+    }
+
+    const columns = filteredFields.map(([key]) => `${key} = ?`).join(", ");
+    const values = filteredFields.map(([, value]) => value);
     const query = `
-        UPDATE user 
-        SET 
-            username = ?, 
-            avatar = ?, 
-            cover = ?, 
-            name = ?, 
-            surname = ?, 
-            description = ?, 
-            city = ?, 
-            school = ?, 
-            work = ?, 
-            website = ?
-        WHERE id = ?
+      UPDATE user
+      SET ${columns}
+      WHERE id = ?
     `;
 
-    db.query(
-        query,
-        [
-            username || null,
-            avatar || null,
-            cover || null,
-            name || null,
-            surname || null,
-            description || null,
-            city || null,
-            school || null,
-            work || null,
-            website || null,
-            id,
-        ],
-        (err, results) => {
-            if (err) {
-                console.error("Error updating user:", err.message);
-                return res.status(500).json({ error: "Database error occurred." });
-            }
+    values.push(id);
 
-            if (results.affectedRows === 0) {
-                return res.status(404).json({ message: "User not found." });
-            }
+    console.log(query);
 
-            res.status(200).json({ message: "User updated successfully." });
+    db.query(query, values, (err, results) => {
+        if (err) {
+            console.error("Error updating user profile:", err.message);
+            return res.status(500).json({ error: "Database error occurred." });
         }
-    );
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        res.status(200).json({ message: "User profile updated successfully." });
+    });
 };
 
 export const getUserByUsername = async (req, res) => {

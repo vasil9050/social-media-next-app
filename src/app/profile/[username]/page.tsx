@@ -53,13 +53,13 @@ async function ProfilePage({ params }: { params: { username: string } }) {
           <div className='flex flex-col items-center justify-center'>
             <div className='w-full h-64 relative'>
               <Image
-                src={cover || 'noCover.png'}
+                src={cover || '/noCover.png'}
                 alt={`${username}'s cover`}
                 fill
                 className='rounded-md'
               />
               <Image
-                src={avatar || 'noAvatar.png'}
+                src={avatar || '/noAvatar.png'}
                 alt={`${username}'s avatar`}
                 width={128}
                 height={128}

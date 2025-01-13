@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import UserIteractionInfoCard from './UserIteractionInfoCard';
+import UpdateUser from './UpdateUser';
 
 interface User {
     id?: string;
@@ -70,7 +71,7 @@ async function UserInfoCard({ user }: { user?: User }) {
         <div className='p-4 bg-white rounded-lg shadow-md text-sm flex flex-col gap-4'>
             <div className='flex justify-between items-center font-medium'>
                 <span className='text-grey-500'>User Information</span>
-                {(currentUserId && user?.id && currentUserId !== user.id) ? <Link href='/' className='text-blue-500 text-xs'>See all</Link> : "update user"}
+                {(currentUserId && user?.id && currentUserId !== user.id) ? <Link href='/' className='text-blue-500 text-xs'>See all</Link> : <UpdateUser user={user} />}
             </div>
             <div className='flex flex-col gap-4 text-gray-500'>
                 <div className='flex items-center gap-2'>

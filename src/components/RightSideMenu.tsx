@@ -1,12 +1,33 @@
-import React from 'react'
-import FriendsRequest from './FriendsRequest'
+import React, { Suspense } from 'react'
 import UserInfoCard from './UserInfoCard'
+import FriendRequests from './FriendRequest';
 
-function RightSideMenu({ userId }: { userId?: string }) {
+interface User {
+    username: string;
+    avatar?: string;
+    cover?: string;
+    name?: string;
+    surname?: string;
+    description?: string;
+    city?: string;
+    school?: string;
+    work?: string;
+    website?: string;
+}
+
+function RightSideMenu({ user }: { user?: User }) {
     return (
         <div className='flex flex-col gap-6'>
-            <UserInfoCard />
-            <FriendsRequest />
+            {user &&
+                <>
+                    <Suspense fallback="Loading...">
+                        <UserInfoCard user={user} />
+                    </Suspense>
+                </>
+            }
+            <Suspense fallback="Loading...">
+                <FriendRequests />
+            </Suspense>
         </div>
     )
 }

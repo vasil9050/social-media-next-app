@@ -19,6 +19,10 @@ interface GetUserRequest {
     id: string;
 }
 
+interface GetUserByUserNameRequest {
+    username: string;
+}
+
 interface AddPostRequest {
     desc: string;
     img?: string;
@@ -27,6 +31,24 @@ interface AddPostRequest {
 
 interface GetPostRequest {
     id: string;
+}
+
+interface GetIsFollowed {
+    followerId: string;
+    followingId: string;
+}
+
+interface GetIsFollowReqRes {
+    senderId: string;
+    receiverId: string;
+}
+
+interface isdelete {
+    id: string;
+}
+
+interface followReceive {
+    receiverId: string;
 }
 
 // Axios instance
@@ -46,6 +68,10 @@ export const updateUserReq = (userData: AddUserRequest) => {
     return axiosInstance.post(API_ENDPOINTS.UPDATE_USER, userData);
 };
 
+export const getUserbyusernameReq = ({ username }: GetUserByUserNameRequest) => {
+    return axiosInstance.get(`${API_ENDPOINTS.GET_USER_BY_USERNAME}/${username}`);
+};
+
 export const getUserReq = ({ id }: GetUserRequest) => {
     return axiosInstance.get(`${API_ENDPOINTS.GET_USER}/${id}`);
 };
@@ -56,6 +82,34 @@ export const addPostReq = (postData: AddPostRequest) => {
 
 export const getPostReq = ({ id }: GetPostRequest) => {
     return axiosInstance.get(`${API_ENDPOINTS.GET_POST}/${id}`);
+};
+
+export const getAllFollowReq = (followData: followReceive) => {
+    return axiosInstance.post(API_ENDPOINTS.GET_ALLFOLLOW_REQ, followData);
+};
+
+export const getIsFollowed = (followData: GetIsFollowed) => {
+    return axiosInstance.post(API_ENDPOINTS.IS_FOLLOWED, followData);
+};
+
+export const getIsFollowReqRes = (followData: GetIsFollowReqRes) => {
+    return axiosInstance.post(API_ENDPOINTS.IS_FOLLOW_REQ_RES, followData);
+};
+
+export const deleteFollow = (followData: isdelete) => {
+    return axiosInstance.post(API_ENDPOINTS.DELETE_FOLLOW, followData);
+};
+
+export const deleteFollowReq = (followData: isdelete) => {
+    return axiosInstance.post(API_ENDPOINTS.DELETE_FOLLOW_REQ, followData);
+};
+
+export const createFollowReq = (followData: GetIsFollowReqRes) => {
+    return axiosInstance.post(API_ENDPOINTS.CREATE_FOLLOW_REQ, followData);
+};
+
+export const acceptFollowReq = (followData: GetIsFollowReqRes) => {
+    return axiosInstance.post(API_ENDPOINTS.ACCEPT_FOLLOW_REQ, followData);
 };
 
 // Utility to handle errors

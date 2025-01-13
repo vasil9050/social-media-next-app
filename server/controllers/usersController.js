@@ -57,8 +57,16 @@ export const addUser = (req, res) => {
 export const getUser = async (req, res) => {
     const { id } = req.params;
 
-    const query = `SELECT * FROM user WHERE id = ?`;
-
+    const query = `
+    SELECT 
+        user.*, 
+        COUNT(follower.followerId) AS followersCount
+    FROM user
+    LEFT JOIN follower 
+    ON user.id = follower.followingId
+    WHERE user.id = ?
+    GROUP BY user.id
+`;
     try {
         db.query(query, [id], (err, result) => {
             if (err) {
@@ -143,4 +151,41 @@ export const updateUser = (req, res) => {
             res.status(200).json({ message: "User updated successfully." });
         }
     );
+};
+
+export const getUserByUsername = async (req, res) => {
+    const { username } = req.params;
+
+    const query = `
+      SELECT 
+        u.id, u.username, u.avatar, u.cover, u.name, u.surname, 
+        u.description, u.city, u.school, u.work, u.website, 
+        COUNT(DISTINCT f1.followerId) AS followersCount,
+        COUNT(DISTINCT f2.followingId) AS followingsCount,
+        JSON_ARRAYAGG(JSON_OBJECT('postId', p.id, 'desc', p.desc, 'img', p.img)) AS posts
+      FROM user u
+      LEFT JOIN follower f1 ON u.id = f1.followingId
+      LEFT JOIN follower f2 ON u.id = f2.followerId
+      LEFT JOIN post p ON u.id = p.userId
+      WHERE u.username = ?
+      GROUP BY u.id;
+    `;
+
+    try {
+        db.query(query, [username], (err, result) => {
+            if (err) {
+                console.error("Error inserting post:", err.message);
+                return res.status(500).json({ error: "Failed to insert post." });
+            }
+            console.log(result);
+            if (!result || result.length === 0) {
+                return res.status(404).json({ message: 'Post not found' });
+            }
+
+            res.status(200).json(result[0]);
+        });
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 };

@@ -38,11 +38,11 @@ function FriendsRequestList({ request }: { request: FriendRequest[] }) {
         reqState,
         (state, value: number) => state.filter((req) => req.id !== value));
 
-    if (request.length === 0) return <div>No Requests</div>
+    if (request?.length === 0) return <div>No Requests</div>
 
     return (
         <div>
-            {optimisticReq.map((req) => (
+            {optimisticReq?.map((req) => (
                 <div
                     key={req.id}
                     className="flex justify-between items-center mb-4 border-b pb-2"

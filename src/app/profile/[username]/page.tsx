@@ -86,7 +86,7 @@ async function ProfilePage({ params }: { params: { username: string } }) {
           </div>
 
           {/* Posts Section */}
-          <AllPost />
+          <AllPost username={username} />
         </div>
       </div>
 

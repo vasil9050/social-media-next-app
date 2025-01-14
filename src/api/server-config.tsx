@@ -8,10 +8,15 @@ export const API_ENDPOINTS = {
 
 
     GET_LIKE: '/api/like/getlike',
-    CREATE_LIKE: '/api/posts/like/addlike',
+    CREATE_LIKE: '/api/like/createlike',
+    DELETE_LIKE: '/api/like/deletelike',
 
     GET_POST: '/api/post/getpost',
     CREATE_POST: '/api/post/addpost',
+    GET_POST_BY_USERNAME: '/api/post/getpostbyusername',
+    GET_POST_HOME: '/api/post/gethomepageposts',
+    DELETE_POST: '/api/post/deletepost',
+
 
     GET_ALLFOLLOW_REQ: '/api/follow/allFollowReq',
     CREATE_FOLLOW_REQ: '/api/follow/followrequest',

@@ -34,6 +34,10 @@ interface GetPostRequest {
     id: string;
 }
 
+interface GetPostRequestUserId {
+    userId: string;
+}
+
 interface GetIsFollowed {
     followerId: string;
     followingId: string;
@@ -44,8 +48,14 @@ interface GetIsFollowReqRes {
     receiverId: string;
 }
 
-interface isdelete {
-    id: string;
+interface LikeReq {
+    userId: string;
+    postId: number;
+}
+
+interface isDeleteReq {
+    id: number;
+    userId: string;
 }
 
 interface followReceive {
@@ -88,8 +98,20 @@ export const addPostReq = (postData: AddPostRequest) => {
     return axiosInstance.post(API_ENDPOINTS.CREATE_POST, postData);
 };
 
+export const getPostByUsername = (postData: GetUserByUserNameRequest) => {
+    return axiosInstance.post(API_ENDPOINTS.GET_POST_BY_USERNAME, postData);
+};
+
+export const getPostOnHome = (postData: GetPostRequestUserId) => {
+    return axiosInstance.post(API_ENDPOINTS.GET_POST_HOME, postData);
+};
+
 export const getPostReq = ({ id }: GetPostRequest) => {
     return axiosInstance.get(`${API_ENDPOINTS.GET_POST}/${id}`);
+};
+
+export const deletePostReq = (isdelete: isDeleteReq) => {
+    return axiosInstance.post(API_ENDPOINTS.DELETE_POST, isdelete);
 };
 
 export const getAllFollowReq = (followData: followReceive) => {
@@ -118,6 +140,18 @@ export const createFollowReq = (followData: GetIsFollowReqRes) => {
 
 export const acceptFollowReq = (followData: GetIsFollowReqRes) => {
     return axiosInstance.post(API_ENDPOINTS.ACCEPT_FOLLOW_REQ, followData);
+};
+
+export const getLikeReq = (followData: LikeReq) => {
+    return axiosInstance.post(API_ENDPOINTS.GET_LIKE, followData);
+};
+
+export const createLikeReq = (followData: LikeReq) => {
+    return axiosInstance.post(API_ENDPOINTS.CREATE_LIKE, followData);
+};
+
+export const deleteLikeReq = (followData: {id: string}) => {
+    return axiosInstance.post(API_ENDPOINTS.DELETE_LIKE, followData);
 };
 
 // Utility to handle errors

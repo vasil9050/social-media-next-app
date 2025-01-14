@@ -43,7 +43,7 @@ async function ProfileCard() {
           className="rounded-full w-12 h-12 absolute left-0 right-0 m-auto -bottom-6 ring-white ring-2 z-10"
         />
       </div>
-      <div className="h-20 flex flex-col gap-2 items-center">
+      <div className="h-30 flex flex-col gap-2 items-center">
         <span className="font-semibold">
           {username || 'Anonymous'} {surname || ''}
         </span>

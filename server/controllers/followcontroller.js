@@ -1,6 +1,6 @@
 import { db } from "../config/db.js"
 
-export const createFollowRequest = (req, res) => {
+export const createFollowRequest = async (req, res) => {
     const { senderId, receiverId } = req.body;
 
     if (!senderId || !receiverId) {
@@ -13,20 +13,20 @@ export const createFollowRequest = (req, res) => {
         VALUES (?, ?, NOW())
     `;
 
-    db.query(query, [senderId, receiverId], (err, results) => {
-        if (err) {
-            console.error("Error creating follow request:", err.message);
-            return res.status(500).json({ error: "Database error occurred." });
-        }
+    try {
+        const [result] = await db.query(query, [senderId, receiverId]);
 
         res.status(201).json({
             message: "Follow request created successfully.",
-            followRequestId: results.insertId
+            followRequestId: result.insertId
         });
-    });
+    } catch (err) {
+        console.error("Error creating follow request:", err.message);
+        return res.status(500).json({ error: "Database error occurred." });
+    }
 };
 
-export const acceptFollowRequest = (req, res) => {
+export const acceptFollowRequest = async (req, res) => {
     const { senderId, receiverId } = req.body;
 
     if (!senderId || !receiverId) {
@@ -45,27 +45,30 @@ export const acceptFollowRequest = (req, res) => {
         VALUES (?, ?, NOW())
     `;
 
-    // First, delete the follow request
-    db.query(deleteQuery, [senderId, receiverId], (deleteErr) => {
-        if (deleteErr) {
-            console.error("Error deleting follow request:", deleteErr.message);
-            return res.status(500).json({ message: "Error deleting follow request." });
+    try {
+        // Delete the follow request
+        const [deleteResult] = await db.query(deleteQuery, [senderId, receiverId]);
+
+        if (deleteResult.affectedRows === 0) {
+            return res.status(404).json({ message: "Follow request not found." });
         }
 
-        // Then, insert the new follower
-        db.query(insertQuery, [senderId, receiverId], (insertErr, results) => {
-            if (insertErr) {
-                console.error("Error inserting follower:", insertErr.message);
-                return res.status(500).json({ message: "Error inserting follower." });
-            }
+        // Insert the new follower
+        const [insertResult] = await db.query(insertQuery, [senderId, receiverId]);
 
-            res.status(200).json({ message: "Follow request accepted.", followerId: results.insertId });
+        // Respond with success
+        return res.status(200).json({
+            message: "Follow request accepted.",
+            followerId: insertResult.insertId
         });
-    });
+    } catch (err) {
+        console.error("Error processing follow request:", err.message);
+        return res.status(500).json({ message: "Internal server error." });
+    }
 };
 
 
-export const declineFollowRequest = (req, res) => {
+export const declineFollowRequest = async (req, res) => {
     const { id } = req.body;
     console.log(req.body);
 
@@ -78,22 +81,25 @@ export const declineFollowRequest = (req, res) => {
         WHERE id = ?
     `;
 
-    db.query(query, [id], (err, results) => {
-        if (err) {
-            console.error("Error deleting follow request:", err.message);
-            return res.status(500).json({ error: "Database error occurred." });
-        }
+    try {
+        const [result] = await db.query(query, [id]);
 
-        if (results.affectedRows === 0) {
+        if (!result || result.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        if (result.affectedRows === 0) {
             return res.status(404).json({ error: "Follow request not found." });
         }
 
         res.status(200).json({ message: "Follow request deleted successfully." });
-    });
+    } catch (err) {
+        console.error("Error deleting follow request:", err.message);
+        return res.status(500).json({ error: "Database error occurred." });
+    }
 };
 
 
-export const unfollow = (req, res) => {
+export const unfollow = async (req, res) => {
     const { id } = req.body;
     console.log(req.body);
 
@@ -106,18 +112,23 @@ export const unfollow = (req, res) => {
         WHERE id = ?
     `;
 
-    db.query(query, [id], (err, results) => {
-        if (err) {
-            console.error("Error deleting follower:", err.message);
-            return res.status(500).json({ error: "Database error occurred." });
+    try {
+        const [result] = await db.query(query, [id]);
+
+        if (!result || result.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        if (results.affectedRows === 0) {
+        if (result.affectedRows === 0) {
             return res.status(404).json({ error: "Follower not found." });
         }
 
         res.status(200).json({ message: "Follower deleted successfully." });
-    });
+    } catch (err) {
+        console.error("Error deleting follower:", err.message);
+        return res.status(500).json({ error: "Database error occurred." });
+    }
+
 };
 
 // // Get Follow Requests
@@ -144,7 +155,7 @@ export const unfollow = (req, res) => {
 //     }
 // };
 
-export const isUserFollowed = (req, res) => {
+export const isUserFollowed = async (req, res) => {
     const { followerId, followingId } = req.body;
 
     if (!followerId || !followingId) {
@@ -162,23 +173,27 @@ export const isUserFollowed = (req, res) => {
         LIMIT 1
     `;
 
-    db.query(query, [followerId, followingId], (err, results) => {
-        if (err) {
-            console.error("Error checking follow status:", err.message);
-            return res.status(500).json({ message: "Internal server error" });
+    try {
+        const [result] = await db.query(query, [followerId, followingId]);
+
+        if (!result || result.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        if (results.length > 0) {
+        if (result.length > 0) {
             // User is being followed
-            return res.status(200).json(results[0]);
+            return res.status(200).json(result[0]);
         }
 
         // User is not being followed
         return res.status(200).json([{ isFollowing: 0 }]);
-    });
+    } catch (err) {
+        console.error("Error checking follow status:", err.message);
+        return res.status(500).json({ message: "Internal server error" });
+    }
 };
 
-export const isUsersentFollowreq = (req, res) => {
+export const isUsersentFollowreq = async (req, res) => {
     const { senderId, receiverId } = req.body;
 
     if (!senderId || !receiverId) {
@@ -197,23 +212,27 @@ export const isUsersentFollowreq = (req, res) => {
 
     `;
 
-    db.query(query, [senderId, receiverId], (err, results) => {
-        if (err) {
-            console.error("Error checking follow request:", err.message);
-            return res.status(500).json({ message: "Internal server error" });
+    try {
+        const [result] = await db.query(query, [senderId, receiverId]);
+
+        if (!result || result.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        if (results.length > 0) {
+        if (result.length > 0) {
             // Follow request found
-            return res.status(200).json(results[0]);
+            return res.status(200).json(result[0]);
         }
 
         // No follow request found
         return res.status(200).json([{ followReqRes: 0 }]);
-    });
+    } catch (err) {
+        console.error("Error updating user profile:", err.message);
+        return res.status(500).json({ error: "Database error occurred." });
+    }
 };
 
-export const getAllFollowReq = (req, res) => {
+export const getAllFollowReq = async (req, res) => {
     const { receiverId } = req.body;
     console.log(req.body);
 
@@ -242,17 +261,25 @@ export const getAllFollowReq = (req, res) => {
             fr.receiverId = ?
     `;
 
-    db.query(query, [receiverId], (err, results) => {
-        if (err) {
-            console.error("Error fetching follow requests:", err.message);
-            return res.status(500).json({ message: "Internal server error" });
+    try {
+        const [result] = await db.query(query, [receiverId]);
+
+        console.log("result>>>", result);
+        
+
+        if (!result || result.length === 0) {
+            return res.status(200).json([]);
         }
 
-        if (results.length > 0) {
-            console.log(results);
-            return res.status(200).json(results);
+
+        if (result.length > 0) {
+            console.log(result);
+            return res.status(200).json(result);
         }
 
-        return res.status(200).json([]);
-    });
+    } catch (err) {
+        console.error("Error updating user profile:", err.message);
+        return res.status(500).json({ error: "Database error occurred." });
+    }
+
 };

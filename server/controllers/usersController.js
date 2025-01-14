@@ -43,7 +43,7 @@ export const addUser = (req, res) => {
             work || null,
             website || null,
         ],
-        (err, results) => {
+        (err, result) => {
             if (err) {
                 console.error("Error inserting user:", err.message);
                 return res.status(500).json({ error: "Database error occurred." });
@@ -66,26 +66,23 @@ export const getUser = async (req, res) => {
     WHERE user.id = ?
     GROUP BY user.id
 `;
-    try {
-        db.query(query, [id], (err, result) => {
-            if (err) {
-                console.error("Error inserting post:", err.message);
-                return res.status(500).json({ error: "Failed to insert post." });
-            }
-            console.log(result);
-            if (!result || result.length === 0) {
-                return res.status(404).json({ message: 'Post not found' });
-            }
 
-            res.status(200).json(result[0]);
-        });
-    } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(500).json({ message: 'Internal server error' });
+    try {
+        const [result] = await db.query(query, [id]);
+
+        if (!result || result.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        return res.status(200).json(result[0]);
+    } catch (err) {
+        console.error("Error fetching user by username:", err.message);
+        return res.status(500).json({ error: "Failed to fetch user." });
     }
+
 }
 
-export const updateUser = (req, res) => {
+export const updateUser = async (req, res) => {
     const { id, ...fieldsToUpdate } = req.body;
 
     if (!id) {
@@ -113,18 +110,18 @@ export const updateUser = (req, res) => {
 
     console.log(query);
 
-    db.query(query, values, (err, results) => {
-        if (err) {
-            console.error("Error updating user profile:", err.message);
-            return res.status(500).json({ error: "Database error occurred." });
+    try {
+        const [result] = await db.query(query, values);
+
+        if (!result || result.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        if (results.affectedRows === 0) {
-            return res.status(404).json({ message: "User not found." });
-        }
-
-        res.status(200).json({ message: "User profile updated successfully." });
-    });
+        return res.status(200).json(result);
+    } catch (err) {
+        console.error("Error updating user profile:", err.message);
+        return res.status(500).json({ error: "Database error occurred." });
+    }
 };
 
 export const getUserByUsername = async (req, res) => {
@@ -146,20 +143,15 @@ export const getUserByUsername = async (req, res) => {
     `;
 
     try {
-        db.query(query, [username], (err, result) => {
-            if (err) {
-                console.error("Error inserting post:", err.message);
-                return res.status(500).json({ error: "Failed to insert post." });
-            }
-            console.log(result);
-            if (!result || result.length === 0) {
-                return res.status(404).json({ message: 'Post not found' });
-            }
+        const [result] = await db.query(query, [username]);
 
-            res.status(200).json(result[0]);
-        });
-    } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        if (!result || result.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        return res.status(200).json(result[0]);
+    } catch (err) {
+        console.error("Error updating user profile:", err.message);
+        return res.status(500).json({ error: "Database error occurred." });
     }
 };

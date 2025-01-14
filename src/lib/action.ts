@@ -1,7 +1,8 @@
 "use server"
 
-import { acceptFollowReq, createFollowReq, deleteFollow, deleteFollowReq, getIsFollowed, getIsFollowReqRes, updateUserReq } from "@/api/utils";
+import { acceptFollowReq, addPostReq, createFollowReq, createLikeReq, deleteFollow, deleteFollowReq, deleteLikeReq, deletePostReq, getIsFollowed, getIsFollowReqRes, getLikeReq, updateUserReq } from "@/api/utils";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 export const switchFollow = async (userId: string) => {
@@ -117,13 +118,13 @@ export const updateProfile = async (
 
     if (!validatedFields.success) {
         console.log(validatedFields.error.flatten().fieldErrors);
-        return {success:false, error:true}
+        return { success: false, error: true }
     }
 
     const { userId } = auth();
 
     if (!userId) {
-        return {success:false, error:true}
+        return { success: false, error: true }
     }
 
     const data = {
@@ -132,8 +133,89 @@ export const updateProfile = async (
     }
 
     console.log(data);
-    
+
     await updateUserReq(data);
-    
-    return {success:true, error:false}
+
+    return { success: true, error: false }
 }
+
+export const switchLike = async (postId: number) => {
+    const { userId } = auth();
+
+    if (!userId) throw new Error("User is not authenticated!");
+
+    try {
+        const response = await getLikeReq({
+            userId: userId,
+            postId: postId
+        })
+        console.log("existingLike response.data>>>", response.data);
+        let existingLike = response.data
+        console.log("existingLike >>>", existingLike.id);
+
+        if (existingLike.id) {
+            console.log("existingLike >>>", existingLike.id);
+            await deleteLikeReq({
+                id: existingLike.id
+            })
+        } else {
+            await createLikeReq({
+                userId: userId,
+                postId: postId
+            })
+        }
+    } catch (err) {
+        console.log(err);
+        throw new Error("Something went wrong");
+    }
+};
+
+export const addPost = async (formData: FormData, img: string) => {
+    const desc = formData.get("desc") as string;
+
+    const Desc = z.string().min(1).max(255);
+
+    const validatedDesc = Desc.safeParse(desc);
+
+    if (!validatedDesc.success) {
+        console.log("description is not valid");
+        return;
+    }
+    const { userId } = auth();
+
+    if (!userId) throw new Error("User is not authenticated!");
+
+    console.log(userId, desc, img);
+
+    const data = {
+        userId: userId,
+        desc: desc,
+        img: img
+    }
+    try {
+        console.log(data);
+        const response = await addPostReq(data);
+        console.log(response.data);
+        revalidatePath("/")
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const deletePost = async (postId: number) => {
+    const { userId } = auth();
+  
+    if (!userId) throw new Error("User is not authenticated!");
+
+    console.log("delete post", postId);
+    
+    try {
+      await await deletePostReq({
+        id: postId,
+        userId: userId,
+      })
+      revalidatePath("/")
+    } catch (err) {
+      console.log(err);
+    }
+  };

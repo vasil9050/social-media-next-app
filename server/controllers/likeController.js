@@ -13,7 +13,7 @@ export const createLike = async (req, res) => {
         const [result] = await db.query(query, [userId, postId]);
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json([]);
         }
         console.log(result[0]);
         res.status(200).json(result[0]);
@@ -66,7 +66,7 @@ export const deleteLike = async (req, res) => {
         const [result] = await db.query(query, [id]);
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json([]);
         }
         console.log(result);
         res.status(200).json(result);

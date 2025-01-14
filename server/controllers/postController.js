@@ -18,7 +18,7 @@ export const addPost = async (req, res) => {
         const [result] = await db.query(query, [desc, img || null, userId]);
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json([]);
         }
         console.log(result);
         res.status(201).json({
@@ -44,7 +44,7 @@ export const getPost = async (req, res) => {
         const [result] = await db.query(query, [id]);
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json([]);
         }
         console.log(result);
         res.status(200).json(result[0]);
@@ -84,7 +84,7 @@ ORDER BY p.createdAt DESC;
         const [result] = await db.query(query, [username]);
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json([]);
         }
 
 
@@ -134,7 +134,7 @@ ORDER BY p.createdAt DESC;
         const [result] = await db.query(query, [userId, userId]);
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json([]);
         }
 
         const formattedPosts = result.map(post => ({

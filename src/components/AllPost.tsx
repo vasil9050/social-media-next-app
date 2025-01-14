@@ -18,13 +18,10 @@ async function AllPost({ username }: { username?: string }) {
     }
   } catch (error) {
     console.error('Error fetching posts:', error);
-  }
-
-  console.log("post >>>>", posts);
-  
+  }  
 
   return (
-    <div className="p-4 bg-white shadow-md rounded-lg flex flex-col gap-12">
+    <div className="p-4 bg-white shadow-md rounded-xl flex flex-col gap-12">
       {posts?.length ? (
         posts.map((post) => <Post key={post.postId} post={post} />)
       ) : (

@@ -38,6 +38,11 @@ interface GetPostRequestUserId {
     userId: string;
 }
 
+interface getFriendsReq {
+    userId: string;
+}
+ 
+
 interface GetIsFollowed {
     followerId: string;
     followingId: string;
@@ -56,6 +61,10 @@ interface LikeReq {
 interface isDeleteReq {
     id: number;
     userId: string;
+}
+
+interface isdelete {
+    id: number;
 }
 
 interface followReceive {
@@ -152,6 +161,10 @@ export const createLikeReq = (followData: LikeReq) => {
 
 export const deleteLikeReq = (followData: {id: string}) => {
     return axiosInstance.post(API_ENDPOINTS.DELETE_LIKE, followData);
+};
+
+export const getFriendsReq = (bodyData: getFriendsReq) => {
+    return axiosInstance.post(API_ENDPOINTS.GET_FRIENDS, bodyData);
 };
 
 // Utility to handle errors

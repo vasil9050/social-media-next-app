@@ -1,6 +1,8 @@
 import React, { Suspense } from 'react'
 import UserInfoCard from './UserInfoCard'
 import FriendRequests from './FriendRequest';
+import ProfileCard from './ProfileCard';
+import Friends from './Friends';
 
 interface User {
     username: string;
@@ -15,9 +17,10 @@ interface User {
     website?: string;
 }
 
-function RightSideMenu({ user }: { user?: User }) {
+function RightSideMenu({ type, user }: { user?: User, type: "home" | "profile" }) {
     return (
         <div className='flex flex-col gap-6'>
+            {type === "home" && <ProfileCard />}
             {user &&
                 <>
                     <Suspense fallback="Loading...">
@@ -27,6 +30,9 @@ function RightSideMenu({ user }: { user?: User }) {
             }
             <Suspense fallback="Loading...">
                 <FriendRequests />
+            </Suspense>
+            <Suspense fallback="Loading...">
+                <Friends />
             </Suspense>
         </div>
     )

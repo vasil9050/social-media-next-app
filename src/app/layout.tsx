@@ -20,10 +20,13 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={inter.className}>
-          <div className="w-full bg-white px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
+          {/* Fixed Navbar */}
+          <div className="fixed top-0 left-0 w-full bg-white/10 backdrop-blur-md shadow-lg border border-white/20 z-50 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
             <Navbar />
           </div>
-          <div className="w-full bg-sky-100 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
+
+          {/* Main Content */}
+          <div className="mt-20 bg-sky-200 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
             {children}
           </div>
         </body>

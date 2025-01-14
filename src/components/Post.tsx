@@ -7,7 +7,7 @@ import { auth } from '@clerk/nextjs/server';
 interface PostType {
     postId: number; // Unique identifier for the post
     description: string | null; // Post description or null if not provided
-    image: string | null; // Image URL or null if not provided
+    image: string | ""; // Image URL or null if not provided
     postCreatedAt: string; // ISO string for the post creation date
     userId: string; // ID of the user who created the post
     username: string; // Username of the user
@@ -37,7 +37,7 @@ export default function Post({ post }: { post: PostType }) {
                     <span className='font-md'>{post.username}</span>
                 </div>
                 {/* <Image src="/more.png" width={16} height={16} alt="More options" /> */}
-                {userId === post.userId && <PostInfo postId={post.postId} />}
+                {userId === post.userId && <PostInfo postId={post.postId} postImg={post?.image} />}
             </div>
             {/* DESC */}
             <div className='flex flex-col gap-4'>

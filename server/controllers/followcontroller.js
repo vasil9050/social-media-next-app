@@ -85,7 +85,7 @@ export const declineFollowRequest = async (req, res) => {
         const [result] = await db.query(query, [id]);
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json([]);
         }
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: "Follow request not found." });
@@ -116,7 +116,7 @@ export const unfollow = async (req, res) => {
         const [result] = await db.query(query, [id]);
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json([]);
         }
 
         if (result.affectedRows === 0) {
@@ -177,7 +177,7 @@ export const isUserFollowed = async (req, res) => {
         const [result] = await db.query(query, [followerId, followingId]);
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json([]);
         }
 
         if (result.length > 0) {
@@ -216,7 +216,7 @@ export const isUsersentFollowreq = async (req, res) => {
         const [result] = await db.query(query, [senderId, receiverId]);
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json([]);
         }
 
         if (result.length > 0) {
@@ -265,7 +265,7 @@ export const getAllFollowReq = async (req, res) => {
         const [result] = await db.query(query, [receiverId]);
 
         console.log("result>>>", result);
-        
+
 
         if (!result || result.length === 0) {
             return res.status(200).json([]);
@@ -282,4 +282,59 @@ export const getAllFollowReq = async (req, res) => {
         return res.status(500).json({ error: "Database error occurred." });
     }
 
+};
+
+export const getUserConnections = async (req, res) => {
+    const { userId } = req.body;
+
+    if (!userId) {
+        return res.status(400).json({ message: "User ID is required." });
+    }
+
+    // Query to fetch followers
+    const followersQuery = `
+        SELECT 
+            u.id, u.username, u.avatar, u.name, u.surname, 'follower' AS type
+        FROM 
+            user u
+        INNER JOIN 
+            follower f 
+        ON 
+            u.id = f.followerId
+        WHERE 
+            f.followingId = ?;
+    `;
+
+    // Query to fetch following
+    const followingQuery = `
+        SELECT 
+            u.id, u.username, u.avatar, u.name, u.surname, 'following' AS type
+        FROM 
+            user u
+        INNER JOIN 
+            follower f 
+        ON 
+            u.id = f.followingId
+        WHERE 
+            f.followerId = ?;
+    `;
+
+    try {
+        const [result1] = await db.query(followersQuery, [userId]);
+        const [result2] = await db.query(followingQuery, [userId]);
+
+
+        if (!result1 || !result2 || result1.length === 0 || result2.length === 0) {
+            return res.status(200).json([]);
+        }
+
+        console.log("result1 and result2", result1, result2);
+        
+
+        res.status(200).json([...result1, ...result2]);
+
+    } catch (err) {
+        console.error("Error fetching followers or follwings:", followersErr.message);
+        return res.status(500).json({ message: "Error fetching followers." });
+    }
 };

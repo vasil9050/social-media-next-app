@@ -6,7 +6,8 @@ import {
     unfollow,
     getAllFollowReq,
     isUsersentFollowreq,
-    isUserFollowed
+    isUserFollowed,
+    getUserConnections
 } from "../controllers/followcontroller.js";
 const router = express.Router()
 
@@ -17,6 +18,9 @@ router.post("/declinefollowreq", declineFollowRequest);
 router.post("/allFollowReq", getAllFollowReq);
 router.post("/isfollowing", isUserFollowed);
 router.post("/isfollowreqsent", isUsersentFollowreq);
+router.post("/getFriends", getUserConnections);
+
+
 
 
 export default router

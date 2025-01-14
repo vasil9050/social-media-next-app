@@ -24,5 +24,7 @@ export const API_ENDPOINTS = {
     IS_FOLLOW_REQ_RES: '/api/follow/isfollowreqsent',
     DELETE_FOLLOW_REQ: '/api/follow/declinefollowreq',
     DELETE_FOLLOW: '/api/follow/unfollow',
-    ACCEPT_FOLLOW_REQ: 'api/follow/followreqaccepted'
+    ACCEPT_FOLLOW_REQ: 'api/follow/followreqaccepted',
+
+    GET_FRIENDS: 'api/follow/getFriends'
 };

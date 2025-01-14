@@ -42,12 +42,12 @@ async function ProfilePage({ params }: { params: { username: string } }) {
   return (
     <div className='flex gap-6 pt-6'>
       {/* Left Menu */}
-      <div className="hidden xl:block w-[20%]">
+      {/* <div className="hidden xl:block w-[20%]">
         <LeftSideMenu type="profile" />
-      </div>
+      </div> */}
 
       {/* Main Content */}
-      <div className="w-full lg:w-[70%] xl:w-[50%]">
+      <div className="w-full lg:w-[70%] xl:w-[70%]">
         <div className="flex flex-col gap-6">
           {/* Profile Header */}
           <div className='flex flex-col items-center justify-center'>
@@ -92,7 +92,7 @@ async function ProfilePage({ params }: { params: { username: string } }) {
 
       {/* Right Menu */}
       <div className="hidden lg:block w-[30%]">
-        <RightSideMenu user={userData} />
+        <RightSideMenu user={userData} type='profile' />
       </div>
     </div>
   );

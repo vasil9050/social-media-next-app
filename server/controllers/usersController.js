@@ -71,7 +71,7 @@ export const getUser = async (req, res) => {
         const [result] = await db.query(query, [id]);
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json([]);
         }
 
         return res.status(200).json(result[0]);
@@ -114,7 +114,7 @@ export const updateUser = async (req, res) => {
         const [result] = await db.query(query, values);
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json([]);
         }
 
         return res.status(200).json(result);
@@ -128,26 +128,37 @@ export const getUserByUsername = async (req, res) => {
     const { username } = req.params;
 
     const query = `
-      SELECT 
-        u.id, u.username, u.avatar, u.cover, u.name, u.surname, 
-        u.description, u.city, u.school, u.work, u.website, 
-        COUNT(DISTINCT f1.followerId) AS followersCount,
-        COUNT(DISTINCT f2.followingId) AS followingsCount,
-        JSON_ARRAYAGG(JSON_OBJECT('postId', p.id, 'desc', p.desc, 'img', p.img)) AS posts
-      FROM user u
-      LEFT JOIN follower f1 ON u.id = f1.followingId
-      LEFT JOIN follower f2 ON u.id = f2.followerId
-      LEFT JOIN post p ON u.id = p.userId
-      WHERE u.username = ?
-      GROUP BY u.id;
+SELECT 
+    u.id, u.username, u.avatar, u.cover, u.name, u.surname, 
+    u.description, u.city, u.school, u.work, u.website, 
+    COUNT(DISTINCT f1.followerId) AS followersCount,
+    COUNT(DISTINCT f2.followingId) AS followingsCount,
+    (
+        SELECT JSON_ARRAYAGG(
+            JSON_OBJECT('postId', p.id, 'desc', p.desc, 'img', p.img)
+        )
+        FROM (
+            SELECT DISTINCT id, 'desc', img, userId
+            FROM post
+            WHERE userId = u.id
+        ) p
+    ) AS posts
+FROM user u
+LEFT JOIN follower f1 ON u.id = f1.followingId
+LEFT JOIN follower f2 ON u.id = f2.followerId
+WHERE u.username = ?
+GROUP BY u.id;
     `;
 
     try {
         const [result] = await db.query(query, [username]);
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.json([]);
         }
+
+        console.log('>>>>>>', result[0]);
+
 
         return res.status(200).json(result[0]);
     } catch (err) {

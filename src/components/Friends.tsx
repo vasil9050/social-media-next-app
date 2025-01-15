@@ -1,82 +1,84 @@
-import { auth } from "@clerk/nextjs/server";
-import Image from "next/image";
-import Link from "next/link";
-import { getFriendsReq } from "@/api/utils";
+'use client';
 
-const FriendRequests = async () => {
-    const { userId } = auth();
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { useOptimistic } from 'react';
+import Chat from './Chat.tsx';
+import { getFriendRequests, sendMessage } from '@/lib/action';
+import { auth } from '@clerk/nextjs/server';
 
-    if (!userId) return null;
+const Friends = () => {
+    const [currentChatUser, setCurrentChatUser] = useState<{ id: string; username: string } | null>(null);
+    const [mergedConnections, setMergedConnections] = useState<any[]>([]);
 
-    let allReq = [];
+    useEffect(() => {
+        const fetchFriendRequests = async () => {
+            const data = await getFriendRequests();
+            setMergedConnections(data);
+        };
 
-    try {
-        "use server";
-        const response = await getFriendsReq({
-            userId: userId,
-        });
-        console.log("sentornot", response.data);
-        allReq = response.data;
-    } catch (error) {
-        console.error("Error fetching user data:", error);
-    }
+        fetchFriendRequests();
+    }, []);
 
-    // Merge mutual connections
-    const mergedConnections = [];
-    const userMap = new Map();
-
-    allReq.forEach((item) => {
-        const existing = userMap.get(item.id);
-
-        if (existing) {
-            // If the user exists in the map, mark as mutual
-            userMap.set(item.id, { ...item, type: "mutual" });
-        } else {
-            // Otherwise, add the user to the map
-            userMap.set(item.id, item);
+    const handleSendMessage = async (receiverId: string, message: string) => {
+        try {
+            await sendMessage('userId', receiverId, message); // Replace 'userId' with actual user ID
+        } catch (error) {
+            console.error('Error sending message:', error);
         }
-    });
-
-    mergedConnections.push(...userMap.values());
+    };
 
     return (
         <div className="p-4 bg-white rounded-xl shadow-md text-sm flex flex-col gap-4">
-            {/* TOP */}
             <div className="font-medium">
                 <span className="text-gray-500">Friends</span>
                 <div className="mt-4">
-                    {mergedConnections.map((friend: any) => (
-                        <Link
-                            href={`/profile/${friend.username}`}
-                            key={friend.id}
-                            className="flex items-center gap-4 mt-2"
-                        >
-                            <Image
-                                src={friend.avatar || "/noAvatar.png"} // Use a default image if avatar is missing
-                                width={40}
-                                height={40}
-                                alt={friend.username}
-                                className="w-10 h-10 rounded-full object-cover"
-                            />
-                            <span>{friend.username}</span>
-                            <span className="text-xs text-gray-400">
-                                {friend.type === "follower"
-                                    ? "follows you"
-                                    : friend.type === "following"
-                                        ? "you are following"
-                                        : friend.type === "mutual"
-                                            ? "mutually connected"
-                                            : ""}
-                            </span>
-                        </Link>
+                    {mergedConnections.map((friend) => (
+                        <div className="flex items-center justify-between gap-4 mt-2" key={friend.id}>
+                            <div className="flex items-center gap-4">
+                                <Image
+                                    src={friend.avatar || '/noAvatar.png'}
+                                    width={40}
+                                    height={40}
+                                    alt={friend.username}
+                                    className="w-10 h-10 rounded-full object-cover"
+                                />
+                                <div className="flex flex-col">
+                                    <span>{friend.username}</span>
+                                    <span className="text-xs text-gray-400">
+                                        {friend.type === 'follower'
+                                            ? 'follows you'
+                                            : friend.type === 'following'
+                                            ? 'you are following'
+                                            : friend.type === 'mutual'
+                                            ? 'mutually connected'
+                                            : ''}
+                                    </span>
+                                </div>
+                            </div>
+                            <div
+                                className="cursor-pointer"
+                                onClick={() => setCurrentChatUser({ id: friend.id, username: friend.username })}
+                            >
+                                <Image src="/messages.png" alt="Message" width={20} height={20} />
+                            </div>
+                        </div>
                     ))}
-                    {mergedConnections && mergedConnections.length === 0 && (
-                        <span>No Friend</span>
-                    )}
+                    {mergedConnections.length === 0 && <span>No Friends</span>}
                 </div>
             </div>
+
+            {currentChatUser && (
+                <Chat
+                    chatUser={currentChatUser.username}
+                    senderId={'userId'} // Replace with actual user ID
+                    receiverId={currentChatUser.id}
+                    onSendMessage={handleSendMessage}
+                    onClose={() => setCurrentChatUser(null)}
+                />
+            )}
         </div>
     );
 };
 
-export default FriendRequests;
+export default Friends;

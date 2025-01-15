@@ -1,6 +1,6 @@
 "use server"
 
-import { acceptFollowReq, addPostReq, createFollowReq, createLikeReq, deleteFollow, deleteFollowReq, deleteLikeReq, deletePostReq, getIsFollowed, getIsFollowReqRes, getLikeReq, updateUserReq } from "@/api/utils";
+import { acceptFollowReq, addPostReq, createFollowReq, createLikeReq, deleteFollow, deleteFollowReq, deleteLikeReq, deletePostReq, getChats, getFriendsReq, getIsFollowed, getIsFollowReqRes, getLikeReq, getUserReq, sendMessageReq, updateUserReq } from "@/api/utils";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -204,18 +204,112 @@ export const addPost = async (formData: FormData, img: string) => {
 
 export const deletePost = async (postId: number) => {
     const { userId } = auth();
-  
+
     if (!userId) throw new Error("User is not authenticated!");
 
     console.log("delete post", postId);
-    
+
     try {
-      await await deletePostReq({
-        id: postId,
-        userId: userId,
-      })
-      revalidatePath("/")
+        await await deletePostReq({
+            id: postId,
+            userId: userId,
+        })
+        revalidatePath("/")
     } catch (err) {
-      console.log(err);
+        console.log(err);
     }
-  };
+};
+
+export const getFriendRequests = async () => {
+    const { userId } = auth();
+
+    if (!userId) {
+        throw new Error('User not authenticated');
+    }
+
+    try {
+        const response = await getFriendsReq({
+            userId: userId,
+        });
+        console.log('Sent or not:', response.data);
+
+        // Merge mutual connections
+        const mergedConnections = [];
+        const userMap = new Map();
+
+        response.data.forEach((item: { id: any }) => {
+            const existing = userMap.get(item.id);
+            if (existing) {
+                userMap.set(item.id, { ...item, type: 'mutual' });
+            } else {
+                userMap.set(item.id, item);
+            }
+        });
+
+        mergedConnections.push(...userMap.values());
+        return mergedConnections;
+    } catch (error) {
+        console.error('Error fetching friend requests:', error);
+        throw error;
+    }
+};
+
+// Server-side function to send a message
+export const sendMessage = async (senderId: string, receiverId: string, message: string) => {
+    const { userId: currentUserId } = auth();
+
+    if (!currentUserId) {
+        throw new Error('User not authenticated');
+    }
+    try {
+        // You can implement the message sending logic here or use an existing utility
+        await sendMessageReq({
+            senderId: currentUserId, receiverId, message
+        });
+        console.log('Message sent:', currentUserId, receiverId, message);
+    } catch (error) {
+        console.error('Error sending message:', error);
+        throw error;
+    }
+};
+
+export const fetchMessages = async (senderId: string, receiverId: string) => {
+    const { userId: currentUserId } = auth();
+
+    if (!currentUserId) {
+        throw new Error('User not authenticated');
+    }
+
+    console.log(currentUserId, receiverId);
+
+
+    try {
+        const response = await getChats({
+            senderId: currentUserId,
+            receiverId
+        });
+
+        console.log('Fetched messages:', response.data);
+        return response.data.history;
+    } catch (error) {
+        console.error('Error fetching messages:', error);
+        throw error;
+    }
+};
+
+export const currentUserFetch = () => {
+    const { userId: currentUserId } = auth();
+    if (!currentUserId) return '';
+    return currentUserId;
+}
+
+export const userFetch = async (id: string) => {
+
+    console.log(id)
+    try {
+        const response = await getUserReq({ id: id });
+        return response.data.username
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
+}

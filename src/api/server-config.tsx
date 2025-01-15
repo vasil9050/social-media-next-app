@@ -26,5 +26,8 @@ export const API_ENDPOINTS = {
     DELETE_FOLLOW: '/api/follow/unfollow',
     ACCEPT_FOLLOW_REQ: 'api/follow/followreqaccepted',
 
-    GET_FRIENDS: 'api/follow/getFriends'
+    GET_FRIENDS: 'api/follow/getFriends',
+
+    SEND_MESSAGE: 'api/chat/sendmessage',
+    USER_CHAT: 'api/chat/chatHistory'
 };

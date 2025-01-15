@@ -41,7 +41,7 @@ interface GetPostRequestUserId {
 interface getFriendsReq {
     userId: string;
 }
- 
+
 
 interface GetIsFollowed {
     followerId: string;
@@ -73,6 +73,17 @@ interface followReceive {
 
 interface CoverRequest {
     cover: File;
+}
+
+interface messagerequest {
+    senderId: string;
+    receiverId: string;
+    message: string;
+}
+
+interface chathistoryrequest {
+    senderId: string;
+    receiverId: string;
 }
 // Axios instance
 const axiosInstance = axios.create({
@@ -159,12 +170,20 @@ export const createLikeReq = (followData: LikeReq) => {
     return axiosInstance.post(API_ENDPOINTS.CREATE_LIKE, followData);
 };
 
-export const deleteLikeReq = (followData: {id: string}) => {
+export const deleteLikeReq = (followData: { id: string }) => {
     return axiosInstance.post(API_ENDPOINTS.DELETE_LIKE, followData);
 };
 
 export const getFriendsReq = (bodyData: getFriendsReq) => {
     return axiosInstance.post(API_ENDPOINTS.GET_FRIENDS, bodyData);
+};
+
+export const sendMessageReq = (bodyData: messagerequest) => {
+    return axiosInstance.post(API_ENDPOINTS.SEND_MESSAGE, bodyData);
+};
+
+export const getChats = (bodyData: chathistoryrequest) => {
+    return axiosInstance.post(API_ENDPOINTS.USER_CHAT, bodyData);
 };
 
 // Utility to handle errors

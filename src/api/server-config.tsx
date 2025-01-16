@@ -3,6 +3,7 @@ export const API_ENDPOINTS = {
     CREATE_USER: '/api/users/adduser',
     UPDATE_USER: '/api/users/updateuser',
     GET_USER: '/api/users/getuser',
+    GET_ALL_USER: '/api/users/getalluser',
     GET_USER_BY_USERNAME: '/api/users/getuserbyusername',
     UPADTE_COVER: 'api/users/updatecover',
 

@@ -53,6 +53,41 @@ export const addUser = (req, res) => {
     );
 }
 
+export const getAllUser = async (req, res) => {
+    const { word } = req.params;
+
+    console.log(req.params.word, req.query.word)
+
+    const query = `
+SELECT 
+    id, 
+    username, 
+    avatar, 
+    name, 
+    surname 
+FROM 
+    user 
+WHERE 
+    username LIKE CONCAT('%', ?, '%')
+LIMIT 10;
+`;
+
+    try {
+        const [result] = await db.query(query, [word]);
+
+        if (!result || result.length === 0) {
+            return res.json([]);
+        }
+        console.log("search", result);
+        
+        return res.status(200).json(result);
+    } catch (err) {
+        console.error("Error fetching user by username:", err.message);
+        return res.status(500).json({ error: "Failed to fetch user." });
+    }
+
+}
+
 export const getUser = async (req, res) => {
     const { id } = req.params;
 

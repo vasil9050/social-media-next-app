@@ -85,6 +85,10 @@ interface chathistoryrequest {
     senderId: string;
     receiverId: string;
 }
+
+interface searchWord {
+    word: string;
+}
 // Axios instance
 const axiosInstance = axios.create({
     baseURL: SERVER_BASE_URL,
@@ -112,6 +116,10 @@ export const getUserbyusernameReq = ({ username }: GetUserByUserNameRequest) => 
 
 export const getUserReq = ({ id }: GetUserRequest) => {
     return axiosInstance.get(`${API_ENDPOINTS.GET_USER}/${id}`);
+};
+
+export const getAllUserReq = ({ word }: searchWord) => {
+    return axiosInstance.get(`${API_ENDPOINTS.GET_ALL_USER}/${word}`);
 };
 
 export const addPostReq = (postData: AddPostRequest) => {

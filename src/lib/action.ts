@@ -1,6 +1,6 @@
 "use server"
 
-import { acceptFollowReq, addPostReq, createFollowReq, createLikeReq, deleteFollow, deleteFollowReq, deleteLikeReq, deletePostReq, getChats, getFriendsReq, getIsFollowed, getIsFollowReqRes, getLikeReq, getUserReq, sendMessageReq, updateUserReq } from "@/api/utils";
+import { acceptFollowReq, addPostReq, createFollowReq, createLikeReq, deleteFollow, deleteFollowReq, deleteLikeReq, deletePostReq, getAllUserReq, getChats, getFriendsReq, getIsFollowed, getIsFollowReqRes, getLikeReq, getUserReq, sendMessageReq, updateUserReq } from "@/api/utils";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -313,3 +313,29 @@ export const userFetch = async (id: string) => {
         console.error('Error fetching user data:', error);
     }
 }
+
+export const userFetchById = async () => {
+    const { userId } = auth();
+
+    if (!userId) return null;
+
+    let userData = null;
+    try {
+        const response = await getUserReq({ id: userId });
+        userData = response.data;
+        return userData
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
+}
+
+export const allUserFetch = async (word: string) => {
+    try {
+        const response = await getAllUserReq({ word: word });
+        console.log("search", response);
+        return response.data
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
+}
+

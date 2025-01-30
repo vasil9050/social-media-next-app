@@ -5,6 +5,7 @@ import ProfileCard from './ProfileCard';
 import Friends from './Friends';
 
 interface User {
+    id?: string;
     username: string;
     avatar?: string;
     cover?: string;

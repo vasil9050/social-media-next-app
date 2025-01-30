@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import UpdateButton from "./UpdateButton";
 
 interface User {
-  id: string;
+  id?: string;
   username: string;
   avatar?: string;
   cover?: string;

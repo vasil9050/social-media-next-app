@@ -44,45 +44,49 @@ function Navbar() {
                     <Image src="/logo.png" width={70} height={70} alt="logo" />
                 </Link>
             </div>
-            <div className="hidden md:flex w-[50%] text-sm items-center justify-between">
-                <div className="relative w-full">
-                    <input
-                        type="text"
-                        placeholder="Search users..."
-                        className="p-2 w-full bg-sky-100 rounded-xl outline-none"
-                        value={searchWord}
-                        onChange={(e) => setSearchWord(e.target.value)}
-                    />
-                    {searchResults.length > 0 && (
-                        <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-md mt-2 z-10">
-                            {searchResults.map((user) => (
-                                <Link
-                                    key={user.id}
-                                    href={`/profile/${user.username}`}
-                                    className="block px-4 py-2 hover:bg-gray-100"
-                                    onClick={handleResultClick}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <Image
-                                            src={user.avatar || "/noAvatar.png"}
-                                            width={30}
-                                            height={30}
-                                            alt={user.username}
-                                            className="w-8 h-8 rounded-full object-cover"
-                                        />
-                                        <span>{user.username}</span>
-                                    </div>
-                                </Link>
-                            ))}
+            <ClerkLoaded>
+                <SignedIn>
+                    <div className="hidden md:flex w-[50%] text-sm items-center justify-between">
+                        <div className="relative w-full">
+                            <input
+                                type="text"
+                                placeholder="Search users..."
+                                className="p-2 w-full bg-sky-100 rounded-xl outline-none"
+                                value={searchWord}
+                                onChange={(e) => setSearchWord(e.target.value)}
+                            />
+                            {searchResults.length > 0 && (
+                                <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-md mt-2 z-10">
+                                    {searchResults.map((user) => (
+                                        <Link
+                                            key={user.id}
+                                            href={`/profile/${user.username}`}
+                                            className="block px-4 py-2 hover:bg-gray-100"
+                                            onClick={handleResultClick}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <Image
+                                                    src={user.avatar || "/noAvatar.png"}
+                                                    width={30}
+                                                    height={30}
+                                                    alt={user.username}
+                                                    className="w-8 h-8 rounded-full object-cover"
+                                                />
+                                                <span>{user.username}</span>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                            {isLoading && (
+                                <div className="absolute top-full left-0 w-full p-2 text-center text-gray-500">
+                                    Loading...
+                                </div>
+                            )}
                         </div>
-                    )}
-                    {isLoading && (
-                        <div className="absolute top-full left-0 w-full p-2 text-center text-gray-500">
-                            Loading...
-                        </div>
-                    )}
-                </div>
-            </div>
+                    </div>
+                </SignedIn>
+            </ClerkLoaded>
             <div className="w-[30%] flex items-center gap-4 xl:gap-8 justify-end">
                 <ClerkLoading>
                     <div

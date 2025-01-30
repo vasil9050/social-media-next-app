@@ -12,6 +12,7 @@
     "@clerk/nextjs": "^5.1.4",
     "axios": "^1.7.9",
     "babel-plugin-react-compiler": "^0.0.0-experimental-938cd9a-20240601",
+    "framer-motion": "^12.0.6",
     "next": "15.0.0-rc.0",
     "next-cloudinary": "^6.16.0",
     "react": "19.0.0-rc-f994737d14-20240522",

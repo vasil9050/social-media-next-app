@@ -3,6 +3,7 @@ import React from 'react';
 import PostInteracion from './PostInteracion';
 import PostInfo from './postInfo';
 import { auth } from '@clerk/nextjs/server';
+import PostViewImg from './PostViewImg';
 
 interface PostType {
     postId: number; // Unique identifier for the post
@@ -20,7 +21,7 @@ interface PostType {
 export default function Post({ post }: { post: PostType }) {
     console.log("post.likedUsers >>>", post.likedUsers);
 
-    const {userId} = auth()
+    const { userId } = auth()
 
     return (
         <div className='flex flex-col gap-4'>
@@ -40,17 +41,10 @@ export default function Post({ post }: { post: PostType }) {
                 {userId === post.userId && <PostInfo postId={post.postId} postImg={post?.image} />}
             </div>
             {/* DESC */}
+            <PostViewImg postId={post.postId} postImg={post?.image} />
+
             <div className='flex flex-col gap-4'>
-                {post.image && (
-                    <div className='w-full min-h-96 relative'>
-                        <Image
-                            src={post.image}
-                            fill
-                            className='object-cover rounded-md'
-                            alt="Post content"
-                        />
-                    </div>
-                )}
+
                 {post.description && <p>{post.description}</p>}
             </div>
             <PostInteracion postId={post.postId} likes={post.likedUsers} />

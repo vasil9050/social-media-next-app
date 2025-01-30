@@ -20,6 +20,10 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "https://socialmediaappserver-f7c9.onrender.com",
+      },
+      {
+        protocol: "https",
         hostname: "res.cloudinary.com",
       },
     ],

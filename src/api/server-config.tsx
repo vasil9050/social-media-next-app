@@ -1,4 +1,4 @@
-export const SERVER_BASE_URL = 'http://localhost:8080';
+export const SERVER_BASE_URL = 'https://socialmediaappserver-f7c9.onrender.com';
 export const API_ENDPOINTS = {
     CREATE_USER: '/api/users/adduser',
     UPDATE_USER: '/api/users/updateuser',

@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useOptimistic } from 'react';
-import Chat from './Chat.tsx';
 import { getFriendRequests, sendMessage } from '@/lib/action';
 import { auth } from '@clerk/nextjs/server';
+import Chat from './Chat';
 
 const Friends = () => {
     const [currentChatUser, setCurrentChatUser] = useState<{ id: string; username: string } | null>(null);
